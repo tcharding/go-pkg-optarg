@@ -112,15 +112,14 @@ func processArgs(c chan *Option) {
 			continue
 		} // skip app name
 
-		v := strings.TrimSpace(v)
-		if len(v) == 0 {
+		if v = strings.TrimSpace(v); len(v) == 0 {
 			continue
 		}
 
 		if len(v) >= 3 && v[0:2] == LongSwitch {
 			v := strings.TrimSpace(v[2:len(v)])
 			if len(v) == 0 {
-				listAppend(&Remainder, LongSwitch)
+				Remainder = append(Remainder, LongSwitch)
 			} else {
 				opt = findOption(v)
 				if opt == nil {
@@ -138,9 +137,8 @@ func processArgs(c chan *Option) {
 			}
 
 		} else if len(v) >= 2 && v[0:1] == ShortSwitch {
-			v := strings.TrimSpace(v[1:len(v)])
-			if len(v) == 0 {
-				listAppend(&Remainder, ShortSwitch)
+			if v = strings.TrimSpace(v[1:len(v)]); len(v) == 0 {
+				Remainder = append(Remainder, ShortSwitch)
 			} else {
 				for i, _ := range v {
 					tok := v[i : i+1]
@@ -162,7 +160,7 @@ func processArgs(c chan *Option) {
 
 		} else {
 			if opt == nil {
-				listAppend(&Remainder, v)
+				Remainder = append(Remainder, v)
 			} else {
 				opt.value = v
 				c <- opt
@@ -175,17 +173,12 @@ func processArgs(c chan *Option) {
 
 // Add a new command line option to check for.
 func Add(shortname, name, description string, defaultvalue interface{}) {
-	opt := &Option{
+	options = append(options, &Option{
 		ShortName:   shortname,
 		Name:        name,
 		Description: description,
 		defaultval:  defaultvalue,
-	}
-
-	c := make([]*Option, len(options)+1)
-	copy(c, options)
-	c[len(c)-1] = opt
-	options = c
+	})
 }
 
 func findOption(name string) *Option {
@@ -257,11 +250,4 @@ func (this *Option) Float64() float64 {
 		return v
 	}
 	return this.defaultval.(float64)
-}
-
-func listAppend(list *[]string, item string) {
-	c := make([]string, len(*list)+1)
-	copy(c, *list)
-	c[len(c)-1] = item
-	*list = c
 }
