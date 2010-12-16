@@ -7,7 +7,5 @@ test:
 
 clean:
 	make -C optarg clean
-
-format:
 	gofmt -w .
 

@@ -31,9 +31,8 @@ type Option struct {
 	Name        string
 	ShortName   string
 	Description string
-
-	defaultval interface{}
-	value      string
+	defaultval  interface{}
+	value       string
 }
 
 var (
@@ -44,6 +43,8 @@ var (
 	UsageInfo   = fmt.Sprintf("Usage: %s [options]:", os.Args[0])
 )
 
+const headerName = "__hdr"
+
 // Prints usage information in a neatly formatted overview.
 func Usage() {
 	offset := 0
@@ -51,6 +52,10 @@ func Usage() {
 	// Find the largest length of the option name list. Needed to align
 	// the description blocks consistently.
 	for _, v := range options {
+		if v.ShortName == headerName {
+			continue
+		}
+
 		str := fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
 		if len(str) > offset {
 			offset = len(str)
@@ -59,9 +64,14 @@ func Usage() {
 
 	offset++ // add margin.
 
-	fmt.Printf("%s\n\n", UsageInfo)
+	fmt.Printf("%s\n", UsageInfo)
 
 	for _, v := range options {
+		if v.ShortName == headerName {
+			fmt.Printf("\n[%s]\n", v.Description)
+			continue
+		}
+
 		// Print namelist. right-align it based on the maximum width
 		// found in previous loop.
 		str := fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
@@ -169,6 +179,14 @@ func processArgs(c chan *Option) {
 		}
 	}
 	close(c)
+}
+
+// Adds a section header. Useful to separate options into discrete groups.
+func Header(title string) {
+	options = append(options, &Option{
+		ShortName:   headerName,
+		Description: title,
+	})
 }
 
 // Add a new command line option to check for.

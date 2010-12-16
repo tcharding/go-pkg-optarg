@@ -7,7 +7,12 @@
    present in the commandline arguments (os.Args). Call as a for loop:
 
    for opt := range optarg.Parse() {
-   	// ... parse option
+   	  switch opt.ShortName {
+   	  case "h":
+   	  	// ...
+   	  case "v":
+   	  	// ...
+   	  }
    }
 
  - Standard switch tokens are - and --. Can be modified by changing the vars
@@ -36,6 +41,34 @@
   --purge, -p: Clean compiled packages after linking is complete. (defaults to:
                false)
 --------------------------------------------------------------------------------
+
+ - We can organize options into 'sections', by interspersing their definition
+   with header titles.
+   
+      optarg.Header("General options")
+      optarg.Add("h", "help", "Displays this help.", false)
+      optarg.Add("v", "version", "Displays version information.", false)
+
+      optarg.Header("Find synonyms")
+      optarg.Add("l", "list", "List all synonyms for the supplied words.", false)
+      optarg.Add("d", "database", "Name of the thesaurus database to use.", v.DictDB)
+      optarg.Add("s", "server", "Address of the thesaurus database to use.", v.DictServer)
+
+   Since all options are printed in Usage() in the same order they are defined,
+   this allows us to split the definitions up into useful and clearly defined
+   categories. Making it easy for the reader to see which options are related to
+   eachother. This output of the example above is as follows:
+
+   [General options]
+        --help, -h: Displays this help.
+     --version, -v: Displays version information.
+
+   [Find synonyms]
+        --list, -l: List all synonyms for the supplied words.
+    --database, -d: Name of the thesaurus database to use. (defaults to: wn)
+      --server, -s: Address of the thesaurus database to use. (defaults to:
+                    dict.org:2628)
+
 
  - Specify arguments to options using whitespace.
  
