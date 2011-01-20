@@ -83,5 +83,16 @@
  - We support chaining shortform options together like this: -mnopq
    This considers each letter as a separate option. The last one can even have
    an argument if it needs one: -mnopq "foo"
-   
 
+================================================================================
+ INSTALLATION
+================================================================================
+
+ goinstall github.com/jteeuwen/go-pkg-optarg
+
+================================================================================
+ LICENSE
+================================================================================
+
+All code is subject to a 1-clause BSD license. See the LICENSE file for its
+contents.

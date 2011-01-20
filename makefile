@@ -1,13 +1,6 @@
+include $(GOROOT)/src/Make.inc
 
-all: install
+TARG = github.com/jteeuwen/go-pkg-optarg
+GOFILES = optarg.go string.go
 
-install:
-	make -C optarg install
-
-test:
-	make -C optarg test
-
-clean:
-	make -C optarg clean
-	gofmt -w .
-
+include $(GOROOT)/src/Make.pkg
