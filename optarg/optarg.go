@@ -249,13 +249,6 @@ func (this *Option) Uint64() uint64 {
 	return this.defaultval.(uint64)
 }
 
-func (this *Option) Float() float {
-	if v, err := strconv.Atof(this.value); err == nil {
-		return v
-	}
-	return this.defaultval.(float)
-}
-
 func (this *Option) Float32() float32 {
 	if v, err := strconv.Atof32(this.value); err == nil {
 		return v

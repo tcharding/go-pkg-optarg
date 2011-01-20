@@ -1,5 +1,7 @@
 
-all:
+all: install
+
+install:
 	make -C optarg install
 
 test:
