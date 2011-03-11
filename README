@@ -1,4 +1,6 @@
+ ================================================================================
  OPTARG - A simple commandline options parser.
+================================================================================
 
  - Allows options with single and multi character names according to the
    traditional unix way of doing things. eg:  -o versus --option
@@ -85,14 +87,9 @@
    an argument if it needs one: -mnopq "foo"
 
 ================================================================================
- INSTALLATION
+ USAGE
 ================================================================================
 
  goinstall github.com/jteeuwen/go-pkg-optarg
 
-================================================================================
- LICENSE
-================================================================================
-
-All code is subject to a 1-clause BSD license. See the LICENSE file for its
-contents.
+ Refer to optarg_test.go for a usage example.

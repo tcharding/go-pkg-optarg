@@ -1,31 +1,16 @@
-/*
-Copyright (c) 2009-2010 Jim Teeuwen.
+// This work is subject to the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+// license. Its contents can be found at:
+// http://creativecommons.org/publicdomain/zero/1.0/ and
+// http://creativecommons.org/publicdomain/zero/1.0/legalcode
 
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-    1. The origin of this software must not be misrepresented; you must not
-    claim that you wrote the original software. If you use this software
-    in a product, an acknowledgment in the product documentation would be
-    appreciated but is not required.
-
-    2. Altered source versions must be plainly marked as such, and must not be
-    misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source distribution.
-
-*/
 package optarg
 
-import "fmt"
-import "os"
-import "strings"
-import "strconv"
+import (
+	"fmt"
+	"os"
+	"strings"
+	"strconv"
+)
 
 type Option struct {
 	Name        string
@@ -47,6 +32,11 @@ const headerName = "__hdr"
 
 // Prints usage information in a neatly formatted overview.
 func Usage() {
+	var desc, str, format string
+	var ok bool
+	var lines []string
+	var i int
+
 	offset := 0
 
 	// Find the largest length of the option name list. Needed to align
@@ -56,8 +46,7 @@ func Usage() {
 			continue
 		}
 
-		str := fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
-		if len(str) > offset {
+		if str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName); len(str) > offset {
 			offset = len(str)
 		}
 	}
@@ -74,14 +63,13 @@ func Usage() {
 
 		// Print namelist. right-align it based on the maximum width
 		// found in previous loop.
-		str := fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
-		format := fmt.Sprintf("%%%ds", offset)
+		str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
+		format = fmt.Sprintf("%%%ds", offset)
 		fmt.Printf(format, str)
+		desc = v.Description
 
-		desc := v.Description
-		// boolean flags need no 'default value' description. They are either
-		// set or not.
-		if _, ok := v.defaultval.(bool); !ok {
+		// boolean flags need no 'default value' description. They are either set or not.
+		if _, ok = v.defaultval.(bool); !ok {
 			if fmt.Sprintf("%v", v.defaultval) != "" {
 				desc = fmt.Sprintf("%s (defaults to: %v)", desc, v.defaultval)
 			}
@@ -95,13 +83,13 @@ func Usage() {
 		// ALIGN_JUSTIFY for added sexy, but it looks a little funky for
 		// short descriptions. So we'll stick with the establish left-
 		// aligned text.
-		lines := multilineWrap(desc, 80, offset, 0, ALIGN_LEFT)
+		lines = multilineWrap(desc, 80, offset, 0, _ALIGN_LEFT)
 
 		// First line needs to be appended to where we left off.
 		fmt.Printf("%s\n", strings.TrimSpace(lines[0]))
 
 		// Print the rest as-is (properly indented).
-		for i := 1; i < len(lines); i++ {
+		for i = 1; i < len(lines); i++ {
 			fmt.Printf("%s\n", lines[i])
 		}
 	}
@@ -117,7 +105,11 @@ func Parse() <-chan *Option {
 
 func processArgs(c chan *Option) {
 	var opt *Option
-	for i, v := range os.Args {
+	var ok bool
+	var tok, v string
+	var i int
+
+	for i, v = range os.Args {
 		if i == 0 {
 			continue
 		} // skip app name
@@ -127,7 +119,7 @@ func processArgs(c chan *Option) {
 		}
 
 		if len(v) >= 3 && v[0:2] == LongSwitch {
-			v := strings.TrimSpace(v[2:len(v)])
+			v = strings.TrimSpace(v[2:len(v)])
 			if len(v) == 0 {
 				Remainder = append(Remainder, LongSwitch)
 			} else {
@@ -138,8 +130,7 @@ func processArgs(c chan *Option) {
 					os.Exit(1)
 				}
 
-				_, ok := opt.defaultval.(bool)
-				if ok {
+				if _, ok = opt.defaultval.(bool); ok {
 					opt.value = "true"
 					c <- opt
 					opt = nil
@@ -150,8 +141,8 @@ func processArgs(c chan *Option) {
 			if v = strings.TrimSpace(v[1:len(v)]); len(v) == 0 {
 				Remainder = append(Remainder, ShortSwitch)
 			} else {
-				for i, _ := range v {
-					tok := v[i : i+1]
+				for i = range v {
+					tok = v[i : i+1]
 					opt = findOption(tok)
 					if opt == nil {
 						fmt.Fprintf(os.Stderr, "Unknown option '-%s' specified.\n", tok)
@@ -200,9 +191,9 @@ func Add(shortname, name, description string, defaultvalue interface{}) {
 }
 
 func findOption(name string) *Option {
-	for _, opt := range options {
-		if opt.Name == name || opt.ShortName == name {
-			return opt
+	for i := range options {
+		if options[i].Name == name || options[i].ShortName == name {
+			return options[i]
 		}
 	}
 	return nil
