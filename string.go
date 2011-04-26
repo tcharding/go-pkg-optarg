@@ -21,11 +21,13 @@ const (
 var reg_multilinewrap = regexp.MustCompile("[^a-zA-Z0-9,.]")
 
 func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int) []string {
-	lines := make([]string, 0)
-	pad := ""
+	var n int
 
-	for n := 0; n < leftmargin; n++ {
-		pad += " "
+	lines := make([]string, 0)
+	pad := make([]byte, leftmargin)
+
+	for n = 0; n < leftmargin; n++ {
+		pad[n] = ' '
 	}
 
 	linesize--
@@ -38,11 +40,10 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 	size := linesize - leftmargin - rightmargin
 
 	if len(text) <= size {
-		lines = []string{align(text, pad, linesize, size, alignment)}
-		return lines
+		return []string{align(text, pad, linesize, size, alignment)}
 	}
 
-	for n := 0; n < len(text); n++ {
+	for n = 0; n < len(text); n++ {
 		if reg_multilinewrap.MatchString(text[n : n+1]) {
 			wordboundary = n
 		}
@@ -51,7 +52,7 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 			lines = append(lines,
 				align(strings.TrimSpace(text[0:wordboundary]),
 					pad, linesize, size, alignment))
-			text = text[wordboundary:len(text)]
+			text = text[wordboundary:]
 			n = 0
 		}
 	}
@@ -60,17 +61,16 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 	return lines
 }
 
-func align(v, pad string, linesize, size, alignment int) string {
-	var data []byte
-	buf := bytes.NewBuffer(data)
-
+func align(v string, pad []byte, linesize, size, alignment int) string {
+	var buf bytes.Buffer
 	switch alignment {
 	case _ALIGN_LEFT:
-		buf.WriteString(pad)
+		buf.Write(pad)
 		buf.WriteString(v)
 
 	case _ALIGN_RIGHT:
 		diff := linesize - len(v) - len(pad)
+		buf.Write(pad)
 		for n := 0; n < diff; n++ {
 			buf.WriteByte(' ')
 		}
@@ -78,45 +78,33 @@ func align(v, pad string, linesize, size, alignment int) string {
 
 	case _ALIGN_CENTER:
 		diff := (size - len(v)) / 2
-		buf.WriteString(pad)
+		buf.Write(pad)
 		for n := 0; n < diff; n++ {
 			buf.WriteByte(' ')
 		}
 		buf.WriteString(v)
 
 	case _ALIGN_JUSTIFY:
-		if strings.Index(v, " ") == -1 {
-			buf.WriteString(pad)
-			buf.WriteString(v)
-			return buf.String()
-		}
-
 		diff := size - len(v)
-		if diff == 0 {
-			buf.WriteString(pad)
+		if strings.Index(v, " ") == -1 || diff == 0  {
+			buf.Write(pad)
 			buf.WriteString(v)
 			break
 		}
 
-		spread := "  "
-		for {
-			if v = strings.Replace(v, spread[0:len(spread)-1], spread, -1); len(v) > size {
-				break
-			}
-			spread += " "
+		var spread string 
+		for spread = "  "; len(v) < size; spread += " " {
+			v = strings.Replace(v, spread[0:len(spread)-1], spread, -1)
 		}
 
-		for {
+		for ; len(v) > size; {
 			if strings.Index(v, spread) == -1 {
 				spread = spread[0 : len(spread)-1]
 			}
-
-			if v = strings.Replace(v, spread, spread[0:len(spread)-1], 1); len(v) <= size {
-				break
-			}
+			v = strings.Replace(v, spread, spread[0:len(spread)-1], 1)
 		}
 
-		buf.WriteString(pad)
+		buf.Write(pad)
 		buf.WriteString(v)
 	}
 
