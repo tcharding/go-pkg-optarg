@@ -57,7 +57,10 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 		}
 	}
 
-	lines = append(lines, align(strings.TrimSpace(text), pad, linesize, size, alignment))
+	if len(text) > 0 {
+		lines = append(lines, align(strings.TrimSpace(text), pad, linesize, size, alignment))
+	}
+
 	return lines
 }
 
