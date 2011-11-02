@@ -107,24 +107,21 @@ func processArgs(c chan *Option) {
 	var opt *Option
 	var ok bool
 	var tok, v string
-	var i int
 
-	for i, v = range os.Args {
+	for i := range os.Args {
 		if i == 0 {
 			continue
 		} // skip app name
 
-		if v = strings.TrimSpace(v); len(v) == 0 {
+		if v = strings.TrimSpace(os.Args[i]); len(v) == 0 {
 			continue
 		}
 
 		if len(v) >= 3 && v[0:2] == LongSwitch {
-			v = strings.TrimSpace(v[2:len(v)])
-			if len(v) == 0 {
+			if v = strings.TrimSpace(v[2:]); len(v) == 0 {
 				Remainder = append(Remainder, LongSwitch)
 			} else {
-				opt = findOption(v)
-				if opt == nil {
+				if opt = findOption(v); opt == nil {
 					fmt.Fprintf(os.Stderr, "Unknown option '--%s' specified.\n", v)
 					Usage()
 					os.Exit(1)
@@ -138,7 +135,7 @@ func processArgs(c chan *Option) {
 			}
 
 		} else if len(v) >= 2 && v[0:1] == ShortSwitch {
-			if v = strings.TrimSpace(v[1:len(v)]); len(v) == 0 {
+			if v = strings.TrimSpace(v[1:]); len(v) == 0 {
 				Remainder = append(Remainder, ShortSwitch)
 			} else {
 				for i = range v {
@@ -150,8 +147,7 @@ func processArgs(c chan *Option) {
 						os.Exit(1)
 					}
 
-					_, ok := opt.defaultval.(bool)
-					if ok {
+					if _, ok := opt.defaultval.(bool); ok {
 						opt.value = "true"
 						c <- opt
 						opt = nil

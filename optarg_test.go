@@ -73,5 +73,5 @@ func Test(t *testing.T) {
 	}
 
 	// This outputs the usage information. No need to do this in a test case.
-	Usage()
+	//Usage()
 }
