@@ -6,9 +6,9 @@
 package optarg
 
 import (
-	"strings"
 	"bytes"
 	"regexp"
+	"strings"
 )
 
 const (
@@ -89,18 +89,18 @@ func align(v string, pad []byte, linesize, size, alignment int) string {
 
 	case _ALIGN_JUSTIFY:
 		diff := size - len(v)
-		if strings.Index(v, " ") == -1 || diff == 0  {
+		if strings.Index(v, " ") == -1 || diff == 0 {
 			buf.Write(pad)
 			buf.WriteString(v)
 			break
 		}
 
-		var spread string 
+		var spread string
 		for spread = "  "; len(v) < size; spread += " " {
 			v = strings.Replace(v, spread[0:len(spread)-1], spread, -1)
 		}
 
-		for ; len(v) > size; {
+		for len(v) > size {
 			if strings.Index(v, spread) == -1 {
 				spread = spread[0 : len(spread)-1]
 			}

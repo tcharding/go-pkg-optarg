@@ -8,8 +8,8 @@ package optarg
 import (
 	"fmt"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type Option struct {
