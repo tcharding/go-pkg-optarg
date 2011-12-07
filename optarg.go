@@ -142,6 +142,7 @@ func processArgs(c chan *Option) {
 					tok = v[i : i+1]
 					opt = findOption(tok)
 					if opt == nil {
+
 						fmt.Fprintf(os.Stderr, "Unknown option '-%s' specified.\n", tok)
 						Usage()
 						os.Exit(1)
@@ -222,7 +223,7 @@ func (this *Option) Int64() int64 {
 
 func (this *Option) Uint() uint {
 	if v, err := strconv.ParseUint(this.value, 10, 0); err == nil {
-		return v
+		return uint(v)
 	}
 	return this.defaultval.(uint)
 }
@@ -238,7 +239,7 @@ func (this *Option) Uint64() uint64 {
 
 func (this *Option) Float32() float32 {
 	if v, err := strconv.ParseFloat(this.value, 32); err == nil {
-		return v
+		return float32(v)
 	}
 	return this.defaultval.(float32)
 }
