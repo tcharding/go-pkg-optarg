@@ -198,7 +198,7 @@ func findOption(name string) *Option {
 func (this *Option) String() string { return this.value }
 
 func (this *Option) Bool() bool {
-	if b, err := strconv.Atob(this.value); err == nil {
+	if b, err := strconv.ParseBool(this.value); err == nil {
 		return b
 	}
 	return false
@@ -214,14 +214,14 @@ func (this *Option) Int8() int8   { return int8(this.Int()) }
 func (this *Option) Int16() int16 { return int16(this.Int()) }
 func (this *Option) Int32() int32 { return int32(this.Int()) }
 func (this *Option) Int64() int64 {
-	if v, err := strconv.Atoi64(this.value); err == nil {
+	if v, err := strconv.ParseInt(this.value, 10, 64); err == nil {
 		return v
 	}
 	return this.defaultval.(int64)
 }
 
 func (this *Option) Uint() uint {
-	if v, err := strconv.Atoui(this.value); err == nil {
+	if v, err := strconv.ParseUint(this.value, 10, 0); err == nil {
 		return v
 	}
 	return this.defaultval.(uint)
@@ -230,21 +230,21 @@ func (this *Option) Uint8() uint8   { return uint8(this.Int()) }
 func (this *Option) Uint16() uint16 { return uint16(this.Int()) }
 func (this *Option) Uint32() uint32 { return uint32(this.Int()) }
 func (this *Option) Uint64() uint64 {
-	if v, err := strconv.Atoui64(this.value); err == nil {
+	if v, err := strconv.ParseUint(this.value, 10, 64); err == nil {
 		return v
 	}
 	return this.defaultval.(uint64)
 }
 
 func (this *Option) Float32() float32 {
-	if v, err := strconv.Atof32(this.value); err == nil {
+	if v, err := strconv.ParseFloat(this.value, 32); err == nil {
 		return v
 	}
 	return this.defaultval.(float32)
 }
 
 func (this *Option) Float64() float64 {
-	if v, err := strconv.Atof64(this.value); err == nil {
+	if v, err := strconv.ParseFloat(this.value, 64); err == nil {
 		return v
 	}
 	return this.defaultval.(float64)
