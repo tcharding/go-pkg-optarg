@@ -90,6 +90,4 @@
  USAGE
 ================================================================================
 
- goinstall github.com/jteeuwen/go-pkg-optarg
-
  Refer to optarg_test.go for a usage example.
