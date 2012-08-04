@@ -7,10 +7,12 @@ package optarg
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
 func Test(t *testing.T) {
+	options = make([]*Option, 0)
 	os.Args = []string{ // manually rebuild os.Args for testing purposes.
 		os.Args[0],
 		"--bin", "/a/b/foo/bin",
@@ -74,4 +76,62 @@ func Test(t *testing.T) {
 
 	// This outputs the usage information. No need to do this in a test case.
 	//Usage()
+}
+
+// Verify that providing empty switch ShortNames does not mess up
+// the Usage string formatting
+func TestNoShortNames(t *testing.T) {
+	options = make([]*Option, 0)
+
+	expected := []string{
+		" --verbose, -v: verbose mode",
+		"         --bin: path to binary",
+		"        --arch: target architecture (defaults to: amd64)",
+		"     --version: show version info",
+	}
+
+	// Add some flags
+	Add("v", "verbose", "verbose mode", false)
+	Add("", "bin", "path to binary", "")
+	Add("", "arch", "target architecture", "amd64")
+	Add("", "version", "show version info", false)
+
+	lines := strings.Split(UsageString(), "\n")
+	// strip off "Usage: ..." part and a final empty string
+	lines = lines[1 : len(lines)-1]
+
+	for i, line := range lines {
+		if line != expected[i] {
+			t.Errorf("Usage(): Expected usage string %s, got %s", line, expected[i])
+		}
+	}
+}
+
+func TestCustomHeaderFmt(t *testing.T) {
+	options = make([]*Option, 0)
+
+	expected := []string{
+		" --verbose, -v: verbose mode",
+		"",
+		" ** Advanced **",
+		"        --arch: target architecture (defaults to: amd64)",
+		" --version, -V: show version info",
+	}
+
+	// set the HeaderFmt to something dumb
+	HeaderFmt = "\n ** %s **"
+
+	Add("v", "verbose", "verbose mode", false)
+	Header("Advanced")
+	Add("", "arch", "target architecture", "amd64")
+	Add("V", "version", "show version info", false)
+
+	lines := strings.Split(UsageString(), "\n")
+	lines = lines[1 : len(lines)-1]
+
+	for i, line := range lines {
+		if line != expected[i] {
+			t.Errorf("Usage(): Expected usage string %s, got %s", line, expected[i])
+		}
+	}
 }

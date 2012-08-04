@@ -26,15 +26,16 @@ var (
 	ShortSwitch = "-"
 	LongSwitch  = "--"
 	UsageInfo   = fmt.Sprintf("Usage: %s [options]:", os.Args[0])
+	HeaderFmt   = "\n[%s]"
 )
 
 const headerName = "__hdr"
 
-// Prints usage information in a neatly formatted overview.
-func Usage() {
+// Returns usage information in a neatly formatted string.
+func UsageString() string {
 	var desc, str, format string
 	var ok bool
-	var lines []string
+	var lines, output []string
 	var i int
 
 	offset := 0
@@ -45,27 +46,36 @@ func Usage() {
 		if v.ShortName == headerName {
 			continue
 		}
-
-		if str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName); len(str) > offset {
+		// If there's no short name, skip it in the description
+		if len(v.ShortName) == 0 {
+			str = fmt.Sprintf("%s%s:", LongSwitch, v.Name)
+		} else {
+			str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
+		}
+		if len(str) > offset {
 			offset = len(str)
 		}
 	}
 
 	offset++ // add margin.
 
-	fmt.Printf("%s\n", UsageInfo)
+	output = append(output, UsageInfo)
 
 	for _, v := range options {
 		if v.ShortName == headerName {
-			fmt.Printf("\n[%s]\n", v.Description)
+			output = append(output, fmt.Sprintf(HeaderFmt, v.Description))
 			continue
 		}
 
 		// Print namelist. right-align it based on the maximum width
 		// found in previous loop.
-		str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
+		if len(v.ShortName) == 0 {
+			str = fmt.Sprintf("%s%s: ", LongSwitch, v.Name)
+		} else {
+			str = fmt.Sprintf("%s%s, %s%s: ", LongSwitch, v.Name, ShortSwitch, v.ShortName)
+		}
 		format = fmt.Sprintf("%%%ds", offset)
-		fmt.Printf(format, str)
+		str = fmt.Sprintf(format, str)
 		desc = v.Description
 
 		// boolean flags need no 'default value' description. They are either set or not.
@@ -86,13 +96,20 @@ func Usage() {
 		lines = multilineWrap(desc, 80, offset, 0, _ALIGN_LEFT)
 
 		// First line needs to be appended to where we left off.
-		fmt.Printf("%s\n", strings.TrimSpace(lines[0]))
+		output = append(output, fmt.Sprintf("%s%s", str, strings.TrimSpace(lines[0])))
 
 		// Print the rest as-is (properly indented).
 		for i = 1; i < len(lines); i++ {
-			fmt.Printf("%s\n", lines[i])
+			output = append(output, lines[i])
 		}
 	}
+	return strings.Join(output, "\n") + "\n"
+}
+
+// Prints usage information in a neatly formatted overview.
+func Usage() {
+	fmt.Print(UsageString())
+	return
 }
 
 // Parse os.Args using the previously added Options.
@@ -189,7 +206,7 @@ func Add(shortname, name, description string, defaultvalue interface{}) {
 
 func findOption(name string) *Option {
 	for i := range options {
-		if options[i].Name == name || options[i].ShortName == name {
+		if options[i].Name == name || (len(options[i].ShortName) > 0 && options[i].ShortName == name) {
 			return options[i]
 		}
 	}

@@ -4,6 +4,7 @@
 
  - Allows options with single and multi character names according to the
    traditional unix way of doing things. eg:  -o versus --option
+ - Allows multi character only named options, eg: --verbose without -v
  - Exposes a channel based iterator which returns parsed options from the
    optarg.Parse() function. Note that it only yields Options which are actually
    present in the commandline arguments (os.Args). Call as a for loop:
@@ -59,7 +60,8 @@
    Since all options are printed in Usage() in the same order they are defined,
    this allows us to split the definitions up into useful and clearly defined
    categories. Making it easy for the reader to see which options are related to
-   eachother. This output of the example above is as follows:
+   eachother. The standard Header output format "\n[%s]", which can be modified by
+   optargs.HeaderFmt. This output of the example above is as follows:
 
    [General options]
         --help, -h: Displays this help.
