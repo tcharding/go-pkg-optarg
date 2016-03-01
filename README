@@ -88,6 +88,12 @@
    This considers each letter as a separate option. The last one can even have
    an argument if it needs one: -mnopq "foo"
 
+ - We can set a custom usage string with:
+
+      usageInfo := fmt.Sprintf("Usage: %s [options] arg1 arg2", os.Args[0])
+      optarg.SetUsageInfo(usageInfo)
+
+
 ================================================================================
  USAGE
 ================================================================================
