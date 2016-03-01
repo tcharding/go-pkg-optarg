@@ -31,6 +31,10 @@ var (
 
 const headerName = "__hdr"
 
+func SetUsageInfo(s string) {
+	UsageInfo = s
+}
+
 // Returns usage information in a neatly formatted string.
 func UsageString() string {
 	var desc, str, format string
